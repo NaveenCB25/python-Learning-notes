@@ -2,7 +2,7 @@
 
 # What is String Slicing?
 
-## Definition
+### Definition
 
 String slicing is the process of extracting a specific portion of a string.
 

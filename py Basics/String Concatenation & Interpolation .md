@@ -2,7 +2,7 @@
 
 # What is String Concatenation?
 
-## Definition
+# Definition
 
 String concatenation is the process of joining two or more strings together.
 
