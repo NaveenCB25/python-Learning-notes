@@ -38,3 +38,19 @@ print(isinstance(score, float))
 
 # Final message
 print("Report Card Generated Successfully")
+
+#__________________________________________________________-
+     #OUTPUT
+#___________________________________________
+
+"""Student Name: Naveen
+Age: 20
+Score: 85.5
+Is Student: True
+<class 'str'>
+<class 'int'>
+<class 'float'>
+<class 'bool'>
+True
+True
+Report Card Generated Successfully"""

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Networking Fundamentals — SMB University</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1a;
+    --surface: #111827;
+    --border: #1e2d40;
+    --accent: #00c8ff;
+    --accent2: #0056b3;
+    --text: #e2eaf4;
+    --muted: #6b7f96;
+    --highlight: #00c8ff18;
+    --layer1: #3b82f6;
+    --layer2: #22d3ee;
+    --layer3: #34d399;
+    --layer4: #a78bfa;
+    --layer5: #f59e0b;
+    --layer6: #f97316;
+    --layer7: #ef4444;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* Hero */
+  header {
+    padding: 64px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #e2eaf4 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 300;
+  }
+
+  /* Objectives card */
+  .objectives {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 56px;
+  }
+  .objectives h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .objectives ul {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+  .objectives li {
+    display: flex;
+    gap: 12px;
+    font-size: 0.93rem;
+    color: #b0c0d4;
+  }
+  .objectives li::before {
+    content: '▸';
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Section */
+  section {
+    margin-bottom: 64px;
+  }
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  h2.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    color: #d4e4f4;
+  }
+  p { color: #9bb0c8; font-size: 0.95rem; margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* Cards grid */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-icon { font-size: 1.5rem; margin-bottom: 10px; }
+  .card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .card p { font-size: 0.86rem; margin: 0; color: var(--muted); line-height: 1.5; }
+
+  /* OSI Table */
+  .osi-stack {
+    margin-top: 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .osi-row {
+    display: grid;
+    grid-template-columns: 48px 1fr 2fr;
+    align-items: stretch;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .osi-row:last-child { border-bottom: none; }
+  .osi-row:hover { background: var(--highlight); }
+  .osi-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+  }
+  .osi-name {
+    padding: 14px 18px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+  .osi-desc {
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+  }
+
+  /* Media comparison table */
+  .table-wrap { overflow-x: auto; margin-top: 24px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  thead tr {
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+  }
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: #9bb0c8;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--highlight); }
+
+  /* WAN Technologies */
+  .wan-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  @media (max-width: 600px) { .wan-grid { grid-template-columns: 1fr; } }
+  .wan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .wan-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  .wan-card ul { list-style: none; }
+  .wan-card li { font-size: 0.84rem; color: var(--muted); padding: 3px 0; }
+  .wan-card li::before { content: '— '; color: var(--accent); }
+
+  /* Devices section */
+  .device-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .device-label {
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 18px 14px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border-right: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .device-desc {
+    padding: 18px 20px;
+    font-size: 0.88rem;
+    color: #9bb0c8;
+  }
+
+  /* Summary */
+  .summary-box {
+    background: linear-gradient(135deg, #0a1628 0%, #0d1f38 100%);
+    border: 1px solid #1e3a5f;
+    border-radius: 10px;
+    padding: 32px 36px;
+  }
+  .summary-box h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 18px; color: var(--accent); }
+  .summary-list { list-style: none; display: grid; gap: 9px; }
+  .summary-list li { font-size: 0.9rem; color: #8caac8; display: flex; gap: 10px; }
+  .summary-list li::before { content: '✓'; color: #34d399; flex-shrink: 0; }
+
+  /* Footer */
+  footer {
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Animate in */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  header, section, .objectives { animation: fadeUp 0.5s ease both; }
+  section:nth-of-type(1) { animation-delay: 0.1s; }
+  section:nth-of-type(2) { animation-delay: 0.15s; }
+  section:nth-of-type(3) { animation-delay: 0.2s; }
+  section:nth-of-type(4) { animation-delay: 0.25s; }
+  section:nth-of-type(5) { animation-delay: 0.3s; }
+  section:nth-of-type(6) { animation-delay: 0.35s; }
+  section:nth-of-type(7) { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="eyebrow">SMB University · Cisco Systems</div>
+    <h1>Networking Fundamentals</h1>
+    <p class="subtitle">Selling Cisco SMB Foundation Solutions — Core Concepts Reference</p>
+  </header>
+
+  <div class="objectives">
+    <h2>Learning Objectives</h2>
+    <ul>
+      <li>Describe the function and operation of a hub, switch, and router</li>
+      <li>Describe the function and operation of a firewall and a gateway</li>
+      <li>Describe Layer 2 switching, Layer 3 switching, and routing</li>
+      <li>Identify the seven layers of the OSI model</li>
+      <li>Describe LAN, MAN, and WAN network functionality</li>
+      <li>Identify possible media types for LAN and WAN connections</li>
+    </ul>
+  </div>
+
+  <!-- What is a Network -->
+  <section>
+    <div class="section-label">01 — Basics</div>
+    <h2 class="section-title">What Is a Network?</h2>
+    <p>A network refers to two or more connected computers that can share resources such as data, a printer, an Internet connection, applications, or a combination of these resources.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🏢</div>
+        <h3>LAN — Local Area Network</h3>
+        <p>Connects devices within a limited geographic area such as a building or campus.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏙️</div>
+        <h3>MAN — Metropolitan Area Network</h3>
+        <p>Spans a city or metropolitan region, larger than a LAN but smaller than a WAN.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <h3>WAN — Wide Area Network</h3>
+        <p>Covers broad geographic areas, interconnecting multiple LANs across cities or countries.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Network Topologies -->
+  <section>
+    <div class="section-label">02 — Topologies</div>
+    <h2 class="section-title">Network Topologies</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">—</div>
+        <h3>Bus Topology</h3>
+        <p>All devices share a single communication line (segment) terminated at both ends.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✦</div>
+        <h3>Star Topology</h3>
+        <p>All devices connect to a central hub. Simple to manage and fault-tolerant at node level.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">❊</div>
+        <h3>Extended Star Topology</h3>
+        <p>Multiple star topologies linked together, forming a hierarchical network structure.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAN Technologies -->
+  <section>
+    <div class="section-label">03 — WAN</div>
+    <h2 class="section-title">WAN Technologies</h2>
+    <div class="wan-grid">
+      <div class="wan-card">
+        <h3>Circuit-Switched</h3>
+        <ul>
+          <li>Asynchronous Serial</li>
+          <li>ISDN (Layer 1)</li>
+          <li>Leased Line (Synchronous Serial)</li>
+        </ul>
+      </div>
+      <div class="wan-card">
+        <h3>Broadband / Packet</h3>
+        <ul>
+          <li>Cable (BNC connector)</li>
+          <li>DSL (RJ-11 over telephone line)</li>
+          <li>Wireless WAN</li>
+          <li>Frame Relay (Synchronous Serial)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- OSI Model -->
+  <section>
+    <div class="section-label">04 — OSI Model</div>
+    <h2 class="section-title">The Seven Layers of the OSI Model</h2>
+    <p>A layered network model that reduces complexity, standardizes interfaces, facilitates modular engineering, ensures interoperable technology, accelerates evolution, and simplifies learning.</p>
+    <div class="osi-stack">
+      <div class="osi-row">
+        <div class="osi-num" style="color:var(--layer7)">7</div>
+        <div class="osi-name" style="color:var(--layer7)">Application</div>
+        <div class="osi-desc">Network processes to applications; user-facing protocols (HTTP, FTP, SMTP)</div>
+      </div>
+      <div class="osi-row">
+        <div class="osi-num" style="color:var(--layer6)">6</div>
+        <div class="osi-name" style="color:var(--layer6)">Presentation</div>
+        <div class="osi-desc">Data representation, encryption, compression (SSL/TLS, JPEG, ASCII)</div>
+      </div>
+      <div class="osi-row">
+        <div class="osi-num" style="color:var(--layer5)">5</div>
+        <div class="osi-name" style="color:var(--layer5)">Session</div>
+        <div class="osi-desc">Inter-host communication; establishes, manages, and terminates sessions</div>
+      </div>
+      <div class="osi-row">
+        <div class="osi-num" style="color:var(--layer4)">4</div>
+        <div class="osi-name" style="color:var(--layer4)">Transport</div>
+        <div class="osi-desc">End-to-end reliability; TCP (reliable) and UDP (unreliable); flow control; virtual circuits</div>
+      </div>
+      <div class="osi-row">
+        <div class="osi-num" style="color:var(--layer3)">3</div>
+        <div class="osi-name" style="color:var(--layer3)">Network</div>
+        <div class="osi-desc">Logical IP addressing (32-bit); path selection; routing; QoS prioritization</div>
+      </div>
+      <div class="osi-row">
+        <div class="osi-num" style="color:var(--layer2)">2</div>
+        <div class="osi-name" style="color:var(--layer2)">Data Link</div>
+        <div class="osi-desc">MAC addressing; packet creation/transmission; media access control; bridges &amp; switches</div>
+      </div>
+      <div class="osi-row">
+        <div class="osi-num" style="color:var(--layer1)">1</div>
+        <div class="osi-name" style="color:var(--layer1)">Physical</div>
+        <div class="osi-desc">Binary transmission; electrical &amp; mechanical specifications; cables, connectors, signals</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Physical Media -->
+  <section>
+    <div class="section-label">05 — Physical Media</div>
+    <h2 class="section-title">Physical Media Types &amp; Comparison</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Media Type</th>
+            <th>Bandwidth</th>
+            <th>Distance</th>
+            <th>Cost</th>
+            <th>Connector</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text)">Twisted Pair</strong></td>
+            <td>Up to 1 Gbps</td>
+            <td>Up to 100 m</td>
+            <td>Least expensive</td>
+            <td>RJ-45</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Coaxial</strong></td>
+            <td>10–100 Mbps</td>
+            <td>Up to 500 m</td>
+            <td>Inexpensive</td>
+            <td>BNC</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Fiber Optic</strong></td>
+            <td>Up to 10 Gbps+</td>
+            <td>Up to 60 km</td>
+            <td>Most expensive</td>
+            <td>SC</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text)">Wireless LAN</strong></td>
+            <td>Up to 54 Mbps</td>
+            <td>Up to 100 m</td>
+            <td>Moderate</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Network Devices -->
+  <section>
+    <div class="section-label">06 — Devices</div>
+    <h2 class="section-title">Network Devices by OSI Layer</h2>
+
+    <div class="device-row">
+      <div class="device-label">Hub / Repeater</div>
+      <div class="device-desc"><strong>Layer 1 — Physical.</strong> Repeats signals received on one port to all other ports. Acts as a central connection point (concentrator) but creates a shared collision domain.</div>
+    </div>
+    <div class="device-row">
+      <div class="device-label">Bridge / Switch</div>
+      <div class="device-desc"><strong>Layer 2 — Data Link.</strong> Examines the MAC address in data link headers and forwards frames only to the correct port, opening a full-bandwidth path between ports.</div>
+    </div>
+    <div class="device-row">
+      <div class="device-label">Router</div>
+      <div class="device-desc"><strong>Layer 3 — Network.</strong> Routes IP packets between networks, selecting the best path to deliver data to its destination across an internetwork.</div>
+    </div>
+    <div class="device-row">
+      <div class="device-label">Layer 3 Switch</div>
+      <div class="device-desc"><strong>Layer 3 — Network.</strong> Combines multiport Layer 2 switching with basic routing between VLANs. High-speed, low-latency alternative to traditional routers for intra-network traffic.</div>
+    </div>
+    <div class="device-row">
+      <div class="device-label">Multilayer Switch</div>
+      <div class="device-desc"><strong>Layers 2–4.</strong> Combines L2 switching, L3 routing, and L4 switching in a single device. Offers high-speed scalability and lower latency compared to traditional routers.</div>
+    </div>
+    <div class="device-row">
+      <div class="device-label">Gateway</div>
+      <div class="device-desc"><strong>Multi-layer.</strong> Hardware + software combination that connects dissimilar network environments by performing protocol translation across multiple OSI layers (e.g., PC network ↔ MAC network).</div>
+    </div>
+    <div class="device-row">
+      <div class="device-label">Firewall</div>
+      <div class="device-desc"><strong>Security device.</strong> A system or group of systems that manages and controls access between two or more networks (Inside, Outside, DMZ), enforcing security policies.</div>
+    </div>
+  </section>
+
+  <!-- MAC vs IP -->
+  <section>
+    <div class="section-label">07 — Addressing</div>
+    <h2 class="section-title">Network Addressing</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🔢</div>
+        <h3>MAC Address (Layer 2)</h3>
+        <p>Hardware address burned into the NIC at the factory. Protocol-independent. Found on the MAC sublayer of the Data Link layer. Example: <code style="color:var(--accent);font-family:monospace">00-0C-F1-5E-BE-F2</code></p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <h3>IP Address (Layer 3)</h3>
+        <p>Logical, hierarchical 32-bit addressing scheme used by the Network layer. Defines how network layers of two hosts interact. Example: <code style="color:var(--accent);font-family:monospace">192.168.6.17</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <div class="summary-box">
+    <h2>Module Summary</h2>
+    <ul class="summary-list">
+      <li>Hub (L1) repeats signals to all ports; switch (L2) forwards only to the correct MAC port</li>
+      <li>Router (L3) selects best path for IP packets across an internetwork</li>
+      <li>Layer 3 switch combines L2 switching with basic inter-VLAN routing</li>
+      <li>OSI model has 7 layers: Physical → Data Link → Network → Transport → Session → Presentation → Application</li>
+      <li>LAN (building), MAN (city), WAN (global) define network geographic scope</li>
+      <li>Media types: twisted pair (cheap, 100 m), coaxial (500 m), fiber optic (60 km, fastest), wireless (54 Mbps, 100 m)</li>
+      <li>Firewall controls access between inside, outside, and DMZ networks</li>
+      <li>Gateway translates between dissimilar network environments across OSI layers</li>
+    </ul>
+  </div>
+
+  <footer>
+    <span>© 2006 Cisco Systems, Inc. — SMB University</span>
+    <span>Networking Fundamentals · SMBUF</span>
+  </footer>
+
+</div>
+</body>
+</html>
